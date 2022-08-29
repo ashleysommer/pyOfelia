@@ -1,0 +1,13 @@
+version: "3.6"
+# Requires docker-compose min version 1.22
+# (for complex labels, and for $PWD in dockerfile:)
+services:
+
+  email_downloader:
+    image: docker.io/ashleysommer/pyofelia
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["daemon", "--docker"]
+
+

@@ -1,0 +1,17 @@
+[build-system]
+requires = ["poetry>=1.1.15"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "pyOfelia"
+description = "Python implementation of the Ofelia scheduler"
+version = "0.0.2"
+authors = ["Ashley Sommer <ashleysommer@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+# These packages are mandatory and form the core of this package’s distribution.
+python-dotenv = "^0.20.0"
+docker = "==5.0.3"  # 5.0.3 is what alpine 3.16 provides
+requests = "~2.27.1" # 2.27.1 is what alpine pip3 installs in environment
+crontab = "~0.23.0"

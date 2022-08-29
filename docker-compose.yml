@@ -1,0 +1,48 @@
+version: "3.6"
+# Requires docker-compose min version 1.22
+services:
+
+  scheduler:
+    image: test1:latest
+    volumes:
+      - /run/user/1000/podman/podman.sock:/run/podman.sock:rw
+      - /home/flubba86/CODE/pyOfelia/pyofelia:/usr/local/app/pyofelia:ro
+      - /home/flubba86/CODE/pyOfelia/example-config.ini:/tmp/example-config.ini
+      - .:/tmp/saves
+      - /tmp/pycharm-cache01:/opt/pycharm
+#      - /tmp/pycharm-cache01:/opt/pycharm/cache
+#      - /tmp/pycharm-skel01:/opt/pycharm/skeletons
+    networks:
+      - overlay1
+    depends_on:
+      - email_uploader
+    command: ["daemon", "--docker", "--config", "/tmp/example-config.ini"]
+    environment:
+        - DOCKER_HOST=unix:///run/podman.sock
+    labels:
+      ofelia.job-local.my-sch-job.schedule: "27 * * * *"
+      ofelia.job-local.my-sch-job.command: "echo 'ofelia still running'"
+      ofelia.job-local.my-sch-job2.schedule: "@hourly"
+      ofelia.job-local.my-sch-job2.command: "echo 'ofelia2 still running'"
+
+  email_uploader:
+    image: test1
+    volumes:
+      - /run/user/1000/podman/podman.sock:/run/podman.sock:rw
+      - /tmp/pycharm-cache01:/opt/pycharm
+    environment:
+      - PYTHONUNBUFFERED=TRUE
+      - DOCKER_HOST=unix:///run/podman.sock
+    networks:
+      - overlay1
+    command: ["tail", "-f", "/dev/null"] #By default, this does nothing. It gets scheduled
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-run.emails-cloud-upload.no-overlap: "true"
+      ofelia.job-run.emails-cloud-upload.schedule: "@every 10s"
+      ofelia.job-run.emails-cloud-upload.command: "/bin/sh -c 'echo hello-world && source ./.venv/bin/activate && python3 main.py U -u -n'"
+      ofelia.job-run.emails-cloud-upload.post-delay: "true"
+
+networks:
+  overlay1:
+
